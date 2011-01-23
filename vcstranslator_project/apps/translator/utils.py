@@ -55,6 +55,8 @@ class GitTranslator(BaseTranslator):
             return Pull()
         elif parts == ["clone"]:
             return Clone()
+        elif parts == ["fetch"]:
+             return Fetch()
         elif parts == ["status"]:
             return Status()
         elif parts == ["push"]:
@@ -176,6 +178,9 @@ class HgTranslator(BaseTranslator):
 
     def translate_push(self, command):
         return "hg push"
+
+    def translate_fetch(self, command):
+        return "hg pull"
 
     def translate_pull(self, command):
         return "hg pull -u"

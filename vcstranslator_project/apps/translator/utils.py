@@ -183,7 +183,11 @@ class HgTranslator(BaseTranslator):
         return "hg pull"
 
     def translate_pull(self, command):
-        return "hg pull -u"
+        output = "hg fetch\n"
+        output += "\nRequires the FetchExtension to be enabled in ~/.hgrc:\n"
+        output += "[extensions]\n"
+        output += "hgext.fetch =\n"
+        return output
 
     def translate_diff(self, command):
         return "hg diff"

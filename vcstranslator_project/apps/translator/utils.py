@@ -116,6 +116,9 @@ class GitTranslator(BaseTranslator):
             cmd += " -v"
         return cmd
 
+    def translate_revert(self, command):
+        return "git checkout %s" % " ".join(f.path for f in command.files)
+
     def translate_status(self, command):
         return "git status"
 
@@ -203,8 +206,11 @@ class SVNTranslator(BaseTranslator):
             return Add(files=files)
         elif parts == ["status"]:
             return Status()
-        elif parts[0] == "revert" and len(parts) == 2:
-            files = [SomeFile(parts[1])]
+        elif parts[0] == "revert"
+            if len(parts) == 2:
+                files = [SomeFile(parts[1])]
+            else:
+                files = [SomeFile('')]
             return Revert(files=files)
         elif parts == ["diff"]:
             return Diff()

@@ -83,7 +83,7 @@ class GitTranslator(BaseTranslator):
                 parts.remove("--hard")
                 hard = True
             if not parts: parts = ''
-            return Reset(files=parts, hard=hard)
+            return Reset(tags=parts, hard=hard)
 
     def translate_commit(self, command):
         if command.files is command.ALL:
@@ -202,8 +202,8 @@ class HgTranslator(BaseTranslator):
 
     def translate_reset(self, command):
         if command.hard:
-            if command.files:
-                return "hg revert --no-backup %s" % command.files
+            if command.tags:
+                return "hg revert --no-backup %s" % " ".join(f.path for f in command.tag)
             else:
                 return "hg revert -a --no-backup"
         else:
@@ -364,8 +364,8 @@ class Diff(Command):
     pass
 
 class Reset(Command):
-    def __init__(self, files='', hard=False):
-        self.files = files
+    def __init__(self, tags='', hard=False):
+        self.tags = tags
         self.hard = hard
 
 class Revert(Command):

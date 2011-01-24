@@ -358,7 +358,7 @@ class Clone(Command):
     pass
 
 class Add(Command):
-    def __init__(self, files=None, interactive=False, commit=False):
+    def __init__(self, files=[], interactive=False, commit=False):
         self.files = files
         self.interactive = interactive
         self.commit = commit

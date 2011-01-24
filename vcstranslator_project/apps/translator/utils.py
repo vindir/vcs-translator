@@ -84,7 +84,7 @@ class GitTranslator(BaseTranslator):
             if len(parts) > 1:
                 tags = [SomeTag(t) for t in parts[1:]]
             else:
-                tags = ''
+                tags = []
             return Reset(tags=tags, hard=hard)
 
     def translate_commit(self, command):
@@ -370,7 +370,7 @@ class Diff(Command):
     pass
 
 class Reset(Command):
-    def __init__(self, tags='', hard=False):
+    def __init__(self, tags=[], hard=False):
         self.tags = tags
         self.hard = hard
 

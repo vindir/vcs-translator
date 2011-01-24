@@ -76,6 +76,14 @@ class GitTranslator(BaseTranslator):
             else:
                 return
             return Remote(verbose=verbose)
+        elif parts[0] == ["reset"]:
+            hard = False
+            parts.remove("reset")
+            if "--hard" in parts:
+                parts.remove("--hard")
+                hard = True
+            if not parts: parts = ''
+            return Reset(files=parts, hard=hard)
 
     def translate_commit(self, command):
         if command.files is command.ALL:
@@ -191,6 +199,15 @@ class HgTranslator(BaseTranslator):
 
     def translate_diff(self, command):
         return "hg diff"
+
+    def translate_reset(self, command):
+        if command.hard:
+            if command.files:
+                return "hg revert --no-backup %s" % command.files
+            else:
+                return "hg revert -a --no-backup"
+        else:
+            raise CantHandleYet
 
     def translate_revert(self, command):
         return "hg revert %s --no-backup" % " ".join(f.path for f in command.files)
@@ -345,6 +362,11 @@ class Status(Command):
 
 class Diff(Command):
     pass
+
+class Reset(Command):
+    def __init__(self, files='', hard=False):
+        self.files = files
+        self.hard = hard
 
 class Revert(Command):
     def __init__(self, files):

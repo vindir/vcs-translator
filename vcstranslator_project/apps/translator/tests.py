@@ -50,6 +50,8 @@ class TranslatorTests(TestCase):
         self.assert_translates(t, "add some/other/file.txt", "git add some/other/file.txt")
         self.assert_translates(t, "update", "git pull")
         self.assert_translates(t, "status", "git status")
+        self.assert_translates(t, "revert", "git checkout ")
+        self.assert_translates(t, "revert file.ext", "git checkout file.ext")
 
     def test_git_to_svn(self):
         t = Translator("git", "svn")
@@ -76,13 +78,16 @@ class TranslatorTests(TestCase):
         self.assert_translates(t, "init", "hg init")
         self.assert_translates(t, "clone", "hg clone")
         self.assert_translates(t, "status", "hg status")
-        self.assert_translates(t, "pull", "hg pull -u")
+        self.assert_translates(t, "pull", "hg fetch\n\nRequires the FetchExtension to be enabled in ~/.hgrc:\n[extensions]\nhgext.fetch =\n")
         self.assert_translates(t, "push", "hg push")
         self.assert_translates(t, "diff", "hg diff")
         self.assert_translates(t, "remote", "hg paths")
         self.assert_translates(t, "remote -v", "hg paths")
         self.assert_translates(t, "commit -a", "hg commit")
         self.assert_translates(t, "", "hg")
+        self.assert_translates(t, "fetch", "hg pull")
+        self.assert_translates(t, "git reset --hard tag", "hg revert --no-backup tag")
+        self.assert_translates(t, "git reset --hard", "hg revert -a --no-backup")
 
     def test_svn_to_hg(self):
         t = Translator("svn", "hg")
@@ -122,13 +127,14 @@ class TranslatorTests(TestCase):
     def test_cant_handle_yet(self):
         t = Translator("svn", "git")
         self.assert_cant_handle_yet(t, "commit some/file")
+
         f = FailedTranslation.objects.get()
         self.assertEqual(f.source, "svn")
         self.assertEqual(f.target, "git")
         self.assertEqual(f.command, "commit some/file")
         self.assertEqual(f.count, 1)
-
         self.assert_cant_handle_yet(t, "commit some/file")
+
         f = FailedTranslation.objects.get()
         self.assertEqual(f.count, 2)
 
@@ -137,3 +143,6 @@ class TranslatorTests(TestCase):
 
         t = Translator("svn", "hg")
         self.assert_cant_handle_yet(t, "commit -a")
+
+        t = Translator("git", "hg")
+        self.assert_cant_handle_yet(t, "git reset")
